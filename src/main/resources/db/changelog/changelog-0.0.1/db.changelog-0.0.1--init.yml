@@ -11,7 +11,7 @@ databaseChangeLog:
       author: PRT
       changes:
         - createTable:
-            tableName: locations
+            tableName: location
             columns:
               - column:
                   name: location_id
@@ -33,7 +33,7 @@ databaseChangeLog:
       author: PRT
       changes:
         - createTable:
-            tableName: containers
+            tableName: container
             columns:
               - column:
                   name: container_id
@@ -52,12 +52,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: location_id
+                  name: location_fk
                   type: uuid
                   constraints:
                     nullable: false
-                    references: locations(location_id)
-                    foreignKeyName: fk_containers_locations
+                    references: location(location_id)
+                    foreignKeyName: fk_container_location
                     deleteCascade: true
 
   - changeSet:
@@ -65,7 +65,7 @@ databaseChangeLog:
       author: PRT
       changes:
         - createTable:
-            tableName: items
+            tableName: item
             columns:
               - column:
                   name: item_id
@@ -82,10 +82,10 @@ databaseChangeLog:
                   name: description
                   type: text
               - column:
-                  name: container_id
+                  name: container_fk
                   type: uuid
                   constraints:
                     nullable: false
-                    references: containers(container_id)
-                    foreignKeyName: fk_items_containers
+                    references: container(container_id)
+                    foreignKeyName: fk_item_container
                     deleteCascade: true
