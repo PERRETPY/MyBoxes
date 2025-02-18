@@ -40,7 +40,7 @@ public class KeycloakJwtAuthenticationConverter implements Converter<Jwt, Collec
                         .toList());
             }
         }
-
+        System.out.println(authorities);
         return authorities;
     }
 }
