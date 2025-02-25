@@ -1,0 +1,91 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: PRT
+      changes:
+        - sql:
+            sql: CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+  - changeSet:
+      id: 2
+      author: PRT
+      changes:
+        - createTable:
+            tableName: location
+            columns:
+              - column:
+                  name: location_id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+
+  - changeSet:
+      id: 3
+      author: PRT
+      changes:
+        - createTable:
+            tableName: container
+            columns:
+              - column:
+                  name: container_id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location_fk
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    references: location(location_id)
+                    foreignKeyName: fk_container_location
+                    deleteCascade: true
+
+  - changeSet:
+      id: 4
+      author: PRT
+      changes:
+        - createTable:
+            tableName: item
+            columns:
+              - column:
+                  name: item_id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: container_fk
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    references: container(container_id)
+                    foreignKeyName: fk_item_container
+                    deleteCascade: true
