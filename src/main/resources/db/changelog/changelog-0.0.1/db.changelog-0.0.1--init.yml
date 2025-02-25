@@ -1,20 +1,14 @@
 databaseChangeLog:
-  - changeSet:
-      id: 1
-      author: PRT
-      changes:
-        - sql:
-            sql: CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
   - changeSet:
-      id: 2
+      id: 1
       author: PRT
       changes:
         - createTable:
             tableName: location
             columns:
               - column:
-                  name: location_id
+                  name: id
                   type: uuid
                   constraints:
                     primaryKey: true
@@ -29,22 +23,17 @@ databaseChangeLog:
                   type: text
 
   - changeSet:
-      id: 3
+      id: 2
       author: PRT
       changes:
         - createTable:
             tableName: container
             columns:
               - column:
-                  name: container_id
+                  name: id
                   type: uuid
                   constraints:
                     primaryKey: true
-                    nullable: false
-              - column:
-                  name: type
-                  type: varchar(50)
-                  constraints:
                     nullable: false
               - column:
                   name: name
@@ -52,23 +41,28 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
                   name: location_fk
                   type: uuid
                   constraints:
                     nullable: false
-                    references: location(location_id)
+                    references: location(id)
                     foreignKeyName: fk_container_location
                     deleteCascade: true
 
   - changeSet:
-      id: 4
+      id: 3
       author: PRT
       changes:
         - createTable:
             tableName: item
             columns:
               - column:
-                  name: item_id
+                  name: id
                   type: uuid
                   constraints:
                     primaryKey: true
@@ -86,6 +80,6 @@ databaseChangeLog:
                   type: uuid
                   constraints:
                     nullable: false
-                    references: container(container_id)
+                    references: container(id)
                     foreignKeyName: fk_item_container
                     deleteCascade: true
