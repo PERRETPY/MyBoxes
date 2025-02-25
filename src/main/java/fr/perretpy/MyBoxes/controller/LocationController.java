@@ -1,15 +1,11 @@
 package fr.perretpy.MyBoxes.controller;
 
-import fr.perretpy.MyBoxes.exception.InvalidPageRequestException;
-import fr.perretpy.MyBoxes.exception.InvalidParameterException;
 import fr.perretpy.MyBoxes.exception.ResourceNotFoundException;
-import fr.perretpy.MyBoxes.exception.InternalServerErrorException;
 import fr.perretpy.MyBoxes.model.Location;
 import fr.perretpy.MyBoxes.service.LocationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -23,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

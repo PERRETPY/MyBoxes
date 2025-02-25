@@ -20,6 +20,7 @@ import java.util.UUID;
 @Service
 public class LocationService {
     private LocationRepository locationRepository;
+    private ContainerService containerService;
 
     @Autowired
     public LocationService(LocationRepository locationRepository) {
@@ -80,7 +81,8 @@ public class LocationService {
 
         Location location = locationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Location not found"));
-        //TODO : add delete cascade
+
+        this.containerService.deleteContainerByLocationId(id);
         locationRepository.delete(location);
     }
 }
