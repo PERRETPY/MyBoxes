@@ -50,7 +50,10 @@ public class ContainerController {
                     EntityModel<Container> resource = EntityModel.of(container);
                     Link selfLink = linkTo(methodOn(ContainerController.class)
                             .getContainerById(container.getId())).withSelfRel();
+                    Link itemListLink = linkTo(methodOn(ItemController.class)
+                            .getAllItemsByContainerId(container.getId(), pageable)).withRel("ItemList");
                     resource.add(selfLink);
+                    resource.add(itemListLink);
                     return resource;
                 })
                 .collect(Collectors.toList());
@@ -93,7 +96,10 @@ public class ContainerController {
                     EntityModel<Container> resource = EntityModel.of(container);
                     Link selfLink = linkTo(methodOn(ContainerController.class)
                             .getContainerById(container.getId())).withSelfRel();
+                    Link itemListLink = linkTo(methodOn(ItemController.class)
+                            .getAllItemsByContainerId(container.getId(), pageable)).withRel("ItemList");
                     resource.add(selfLink);
+                    resource.add(itemListLink);
                     return resource;
                 })
                 .collect(Collectors.toList());

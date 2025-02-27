@@ -38,6 +38,21 @@ public class ItemService {
         return itemRepository.findAll(pageable);
     }
 
+    public Page<Item> getAllItemsByContainerId(UUID id, Pageable pageable) throws InvalidPageRequestException {
+        if (pageable.getPageNumber() < 0 || pageable.getPageSize() <= 0) {
+            throw new InvalidPageRequestException("Page ou taille de page invalide");
+        }
+        if (id == null) {
+            throw new InvalidParameterException("ID null");
+        }
+
+        if (!containerRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Container not found");
+        }
+
+        return itemRepository.findAllByContainerId(id, pageable);
+    }
+
     public Optional<Item> getItem(UUID id) throws InvalidParameterException {
         if (id == null) {
             throw new InvalidParameterException("ID null");
