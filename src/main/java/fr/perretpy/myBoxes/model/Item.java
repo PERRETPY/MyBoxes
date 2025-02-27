@@ -19,7 +19,7 @@ public class Item extends RepresentationModel<Item> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "item_id", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "name", nullable = false)

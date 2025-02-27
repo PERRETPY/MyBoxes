@@ -6,7 +6,7 @@ import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
 import fr.perretpy.myBoxes.model.Location;
 import fr.perretpy.myBoxes.repository.LocationRepository;
 import jakarta.transaction.Transactional;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -16,15 +16,17 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import java.util.UUID;
 
-@Data
+@EqualsAndHashCode(callSuper = true)
 @Service
-public class LocationService {
-    private LocationRepository locationRepository;
-    private ContainerService containerService;
+public class LocationService extends GenericService<Location, UUID>{
+    private final LocationRepository locationRepository;
+    private final ContainerService containerService;
 
     @Autowired
-    public LocationService(LocationRepository locationRepository) {
+    public LocationService(LocationRepository locationRepository, ContainerService containerService) {
+        super(locationRepository);
         this.locationRepository = locationRepository;
+        this.containerService = containerService;
     }
 
     public Page<Location> getAllLocations(Pageable pageable) throws InvalidPageRequestException {
@@ -54,23 +56,14 @@ public class LocationService {
     }
 
     public Location updateLocation(UUID id, Location location) throws InvalidParameterException {
-        Optional<Location> optionalExistedLocation = getLocation(id);
-        Location existedLocation;
-        if (optionalExistedLocation.isPresent()) {
-            existedLocation = optionalExistedLocation.get();
-        }else {
-            throw new InvalidParameterException("room id doesn't exist");
-        }
-
-        if(location.getName() != null && !location.getName().isBlank()) {
-            existedLocation.setName(location.getName());
-        }
-
-        if(location.getDescription() != null && !location.getDescription().isBlank()) {
-            existedLocation.setDescription(location.getDescription());
-        }
-
-        return locationRepository.save(existedLocation);
+        return update(id, location, (existing, newEntity) -> {
+            if (newEntity.getName() != null && !newEntity.getName().isBlank()) {
+                existing.setName(newEntity.getName());
+            }
+            if (newEntity.getDescription() != null && !newEntity.getDescription().isBlank()) {
+                existing.setDescription(newEntity.getDescription());
+            }
+        });
     }
 
     @Transactional

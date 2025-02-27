@@ -25,7 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/locations")
-@PreAuthorize("hasAuthority('ROLE_myboxes_user')")
+@PreAuthorize("hasAuthority('ROLE_myboxes_admin')")
 public class LocationController {
     private final Logger logger = LoggerFactory.getLogger(LocationController.class);
 

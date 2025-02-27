@@ -8,7 +8,6 @@ import fr.perretpy.myBoxes.model.Container;
 import fr.perretpy.myBoxes.repository.ItemRepository;
 import fr.perretpy.myBoxes.repository.ContainerRepository;
 import jakarta.transaction.Transactional;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -18,11 +17,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import java.util.UUID;
 
-@Data
 @Service
 public class ItemService {
-    private ItemRepository itemRepository;
-    private ContainerRepository containerRepository;
+    private final ItemRepository itemRepository;
+    private final ContainerRepository containerRepository;
 
     @Autowired
     public ItemService(ItemRepository itemRepository, ContainerRepository containerRepository) {

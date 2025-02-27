@@ -25,7 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/items")
-@PreAuthorize("hasAuthority('ROLE_myboxes_user')")
+@PreAuthorize("hasAuthority('ROLE_myboxes_admin')")
 public class ItemController {
     private final Logger logger = LoggerFactory.getLogger(ItemController.class);
 

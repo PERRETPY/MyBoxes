@@ -8,7 +8,7 @@ import fr.perretpy.myBoxes.model.Location;
 import fr.perretpy.myBoxes.repository.ContainerRepository;
 import fr.perretpy.myBoxes.repository.LocationRepository;
 import jakarta.transaction.Transactional;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -18,15 +18,16 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import java.util.UUID;
 
-@Data
+@EqualsAndHashCode(callSuper = true)
 @Service
-public class ContainerService {
-    private ContainerRepository containerRepository;
-    private LocationRepository locationRepository;
-    private ItemService itemService;
+public class ContainerService extends GenericService<Container, UUID> {
+    private final ContainerRepository containerRepository;
+    private final LocationRepository locationRepository;
+    private final ItemService itemService;
 
     @Autowired
     public ContainerService(ContainerRepository containerRepository, LocationRepository locationRepository, ItemService itemService) {
+        super(containerRepository);
         this.containerRepository = containerRepository;
         this.locationRepository = locationRepository;
         this.itemService = itemService;
@@ -75,29 +76,22 @@ public class ContainerService {
     }
 
     public Container updateContainer(UUID id, Container container) throws InvalidParameterException {
-        Optional<Container> optionalExistedContainer = getContainer(id);
-        Container existedContainer;
-        if (optionalExistedContainer.isPresent()) {
-            existedContainer = optionalExistedContainer.get();
-        }else {
-            throw new InvalidParameterException("room id doesn't exist");
-        }
+        return update(id, container, (existing, newEntity) -> {
 
-        if(container.getName() != null && !container.getName().isBlank()) {
-            existedContainer.setName(container.getName());
-        }
+            if(newEntity.getName() != null && !newEntity.getName().isBlank()) {
+                existing.setName(newEntity.getName());
+            }
 
-        if(container.getType() != null && !container.getType().isBlank()) {
-            existedContainer.setType(container.getType());
-        }
+            if(newEntity.getType() != null && !newEntity.getType().isBlank()) {
+                existing.setType(newEntity.getType());
+            }
 
-        if(container.getLocation().getId() != null) {
-            Location location = locationRepository.findById(container.getLocation().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Location not found"));
-            existedContainer.setLocation(location);
-        }
-
-        return containerRepository.save(existedContainer);
+            if(newEntity.getLocation().getId() != null) {
+                Location location = locationRepository.findById(newEntity.getLocation().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Location not found"));
+                existing.setLocation(location);
+            }
+        });
     }
 
     @Transactional

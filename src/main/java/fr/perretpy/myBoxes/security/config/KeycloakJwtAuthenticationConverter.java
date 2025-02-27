@@ -1,6 +1,7 @@
 package fr.perretpy.myBoxes.security.config;
 
 import fr.perretpy.myBoxes.exception.InvalidParameterException;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -16,7 +17,7 @@ public class KeycloakJwtAuthenticationConverter implements Converter<Jwt, Collec
     @Value("${spring.security.oauth2.client.registration.keycloak.client-id}")
     private String clientId;
 
-
+    @NonNull
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         Collection<GrantedAuthority> authorities = new ArrayList<>();

@@ -19,7 +19,7 @@ public class Container extends RepresentationModel<Container> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "container_id", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "name", nullable = false)
