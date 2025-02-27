@@ -50,7 +50,10 @@ public class LocationController {
                     EntityModel<Location> resource = EntityModel.of(location);
                     Link selfLink = linkTo(methodOn(LocationController.class)
                             .getLocationById(location.getId())).withSelfRel();
+                    Link containerListLink = linkTo(methodOn(ContainerController.class)
+                            .getAllContainersByLocationId(location.getId(), pageable)).withRel("ContainerList");
                     resource.add(selfLink);
+                    resource.add(containerListLink);
                     return resource;
                 })
                 .collect(Collectors.toList());

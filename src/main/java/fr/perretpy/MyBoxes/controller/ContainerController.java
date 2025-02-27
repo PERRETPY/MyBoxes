@@ -50,7 +50,56 @@ public class ContainerController {
                     EntityModel<Container> resource = EntityModel.of(container);
                     Link selfLink = linkTo(methodOn(ContainerController.class)
                             .getContainerById(container.getId())).withSelfRel();
+                    Link itemListLink = linkTo(methodOn(ItemController.class)
+                            .getAllItemsByContainerId(container.getId(), pageable)).withRel("ItemList");
                     resource.add(selfLink);
+                    resource.add(itemListLink);
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        Link selfLink = linkTo(methodOn(ContainerController.class)
+                .getAllContainers(pageable)).withSelfRel();
+
+        Link nextLink = containersPage.hasNext() ?
+                linkTo(methodOn(ContainerController.class)
+                        .getAllContainers(pageable.next())).withRel("next") : null;
+
+        Link prevLink = containersPage.hasPrevious() ?
+                linkTo(methodOn(ContainerController.class)
+                        .getAllContainers(pageable.previousOrFirst())).withRel("prev") : null;
+
+        PagedModel<EntityModel<Container>> pagedModel = PagedModel.of(
+                containerResources,
+                new PagedModel.PageMetadata(
+                        containersPage.getSize(),
+                        containersPage.getNumber(),
+                        containersPage.getTotalElements(),
+                        containersPage.getTotalPages()
+                ),
+                Stream.of(selfLink, nextLink, prevLink)
+                        .filter(Objects::nonNull)
+                        .toList()
+        );
+
+        return ResponseEntity.ok(pagedModel);
+    }
+
+    @GetMapping("/location/{id}")
+    public ResponseEntity<PagedModel<EntityModel<Container>>> getAllContainersByLocationId(@PathVariable UUID id, Pageable pageable) {
+        logger.info("GET request on /api/containers/location/{} with parameters: {}", id, pageable.toString());
+
+        Page<Container> containersPage = containerService.getAllContainersByLocationId(id, pageable);
+
+        List<EntityModel<Container>> containerResources = containersPage.stream()
+                .map(container -> {
+                    EntityModel<Container> resource = EntityModel.of(container);
+                    Link selfLink = linkTo(methodOn(ContainerController.class)
+                            .getContainerById(container.getId())).withSelfRel();
+                    Link itemListLink = linkTo(methodOn(ItemController.class)
+                            .getAllItemsByContainerId(container.getId(), pageable)).withRel("ItemList");
+                    resource.add(selfLink);
+                    resource.add(itemListLink);
                     return resource;
                 })
                 .collect(Collectors.toList());

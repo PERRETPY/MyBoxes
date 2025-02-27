@@ -40,6 +40,22 @@ public class ContainerService {
         return containerRepository.findAll(pageable);
     }
 
+    public Page<Container> getAllContainersByLocationId(UUID id, Pageable pageable) throws InvalidPageRequestException {
+        if (pageable.getPageNumber() < 0 || pageable.getPageSize() <= 0) {
+            throw new InvalidPageRequestException("Page ou taille de page invalide");
+        }
+        if (id == null) {
+            throw new InvalidParameterException("ID null");
+        }
+
+        if (!locationRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Location not found");
+        }
+
+        return containerRepository.findAllByLocationId(id, pageable);
+    }
+
+
     public Optional<Container> getContainer(UUID id) throws InvalidParameterException {
         if (id == null) {
             throw new InvalidParameterException("ID null");

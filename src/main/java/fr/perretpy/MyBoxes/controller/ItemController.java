@@ -1,6 +1,7 @@
 package fr.perretpy.MyBoxes.controller;
 
 import fr.perretpy.MyBoxes.exception.ResourceNotFoundException;
+import fr.perretpy.MyBoxes.model.Container;
 import fr.perretpy.MyBoxes.model.Item;
 import fr.perretpy.MyBoxes.service.ItemService;
 import org.slf4j.Logger;
@@ -44,6 +45,49 @@ public class ItemController {
         logger.info("GET request on /api/items with parameters: {}", pageable.toString());
 
         Page<Item> itemsPage = itemService.getAllItems(pageable);
+
+        List<EntityModel<Item>> itemResources = itemsPage.stream()
+                .map(item -> {
+                    EntityModel<Item> resource = EntityModel.of(item);
+                    Link selfLink = linkTo(methodOn(ItemController.class)
+                            .getItemById(item.getId())).withSelfRel();
+                    resource.add(selfLink);
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        Link selfLink = linkTo(methodOn(ItemController.class)
+                .getAllItems(pageable)).withSelfRel();
+
+        Link nextLink = itemsPage.hasNext() ?
+                linkTo(methodOn(ItemController.class)
+                        .getAllItems(pageable.next())).withRel("next") : null;
+
+        Link prevLink = itemsPage.hasPrevious() ?
+                linkTo(methodOn(ItemController.class)
+                        .getAllItems(pageable.previousOrFirst())).withRel("prev") : null;
+
+        PagedModel<EntityModel<Item>> pagedModel = PagedModel.of(
+                itemResources,
+                new PagedModel.PageMetadata(
+                        itemsPage.getSize(),
+                        itemsPage.getNumber(),
+                        itemsPage.getTotalElements(),
+                        itemsPage.getTotalPages()
+                ),
+                Stream.of(selfLink, nextLink, prevLink)
+                        .filter(Objects::nonNull)
+                        .toList()
+        );
+
+        return ResponseEntity.ok(pagedModel);
+    }
+
+    @GetMapping("/container/{id}")
+    public ResponseEntity<PagedModel<EntityModel<Item>>> getAllItemsByContainerId(@PathVariable UUID id, Pageable pageable) {
+        logger.info("GET request on /api/items/container/{} with parameters: {}", id, pageable.toString());
+
+        Page<Item> itemsPage = itemService.getAllItemsByContainerId(id, pageable);
 
         List<EntityModel<Item>> itemResources = itemsPage.stream()
                 .map(item -> {
