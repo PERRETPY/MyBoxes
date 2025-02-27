@@ -1,4 +1,4 @@
-package fr.perretpy.MyBoxes.exception;
+package fr.perretpy.myBoxes.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

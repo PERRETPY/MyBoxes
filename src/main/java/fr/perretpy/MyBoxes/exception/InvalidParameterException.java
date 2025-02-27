@@ -1,4 +1,4 @@
-package fr.perretpy.MyBoxes.exception;
+package fr.perretpy.myBoxes.exception;
 
 public class InvalidParameterException extends RuntimeException {
     public InvalidParameterException(String message) {

@@ -1,6 +1,6 @@
-package fr.perretpy.MyBoxes.repository;
+package fr.perretpy.myBoxes.repository;
 
-import fr.perretpy.MyBoxes.model.Location;
+import fr.perretpy.myBoxes.model.Location;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

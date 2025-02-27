@@ -1,4 +1,4 @@
-package fr.perretpy.MyBoxes.exception;
+package fr.perretpy.myBoxes.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

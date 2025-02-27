@@ -1,4 +1,4 @@
-package fr.perretpy.MyBoxes.model;
+package fr.perretpy.myBoxes.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,6 +6,7 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "location")
 @Entity
 @Data

@@ -1,6 +1,6 @@
-package fr.perretpy.MyBoxes.repository;
+package fr.perretpy.myBoxes.repository;
 
-import fr.perretpy.MyBoxes.model.Container;
+import fr.perretpy.myBoxes.model.Container;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

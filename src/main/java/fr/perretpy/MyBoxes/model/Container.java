@@ -1,4 +1,4 @@
-package fr.perretpy.MyBoxes.model;
+package fr.perretpy.myBoxes.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "container")
 @Entity
 @Data

@@ -1,10 +1,10 @@
-package fr.perretpy.MyBoxes.service;
+package fr.perretpy.myBoxes.service;
 
-import fr.perretpy.MyBoxes.exception.InvalidPageRequestException;
-import fr.perretpy.MyBoxes.exception.InvalidParameterException;
-import fr.perretpy.MyBoxes.exception.ResourceNotFoundException;
-import fr.perretpy.MyBoxes.model.Location;
-import fr.perretpy.MyBoxes.repository.LocationRepository;
+import fr.perretpy.myBoxes.exception.InvalidPageRequestException;
+import fr.perretpy.myBoxes.exception.InvalidParameterException;
+import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
+import fr.perretpy.myBoxes.model.Location;
+import fr.perretpy.myBoxes.repository.LocationRepository;
 import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class LocationService {
 
     public Location updateLocation(UUID id, Location location) throws InvalidParameterException {
         Optional<Location> optionalExistedLocation = getLocation(id);
-        Location existedLocation = new Location();
+        Location existedLocation;
         if (optionalExistedLocation.isPresent()) {
             existedLocation = optionalExistedLocation.get();
         }else {

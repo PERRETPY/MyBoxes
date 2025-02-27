@@ -1,4 +1,4 @@
-package fr.perretpy.MyBoxes;
+package fr.perretpy.myBoxes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

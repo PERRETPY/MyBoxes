@@ -1,7 +1,7 @@
-package fr.perretpy.MyBoxes.controller;
+package fr.perretpy.myBoxes.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.perretpy.MyBoxes.User;
+import fr.perretpy.myBoxes.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +20,7 @@ public class UserTest {
     @GetMapping("/")
     @PreAuthorize("hasRole('myboxes_admin')")
     public ResponseEntity<Object> getTest(Authentication authentication) {
-        User user = new User();
+        User user;
         try {
             user = User.mapAuthenticationToUser(authentication);
         } catch (JsonProcessingException e) {

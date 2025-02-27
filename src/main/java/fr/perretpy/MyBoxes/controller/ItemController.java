@@ -1,9 +1,9 @@
-package fr.perretpy.MyBoxes.controller;
+package fr.perretpy.myBoxes.controller;
 
-import fr.perretpy.MyBoxes.exception.ResourceNotFoundException;
-import fr.perretpy.MyBoxes.model.Container;
-import fr.perretpy.MyBoxes.model.Item;
-import fr.perretpy.MyBoxes.service.ItemService;
+import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
+import fr.perretpy.myBoxes.model.Item;
+import fr.perretpy.myBoxes.service.ItemService;
+import fr.perretpy.myBoxes.util.HateoasUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -42,90 +38,35 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Item>>> getAllItems(Pageable pageable) {
-        logger.info("GET request on /api/items with parameters: {}", pageable.toString());
+        logger.info("GET request on /api/items with parameters: {}", pageable);
 
         Page<Item> itemsPage = itemService.getAllItems(pageable);
 
-        List<EntityModel<Item>> itemResources = itemsPage.stream()
-                .map(item -> {
-                    EntityModel<Item> resource = EntityModel.of(item);
-                    Link selfLink = linkTo(methodOn(ItemController.class)
-                            .getItemById(item.getId())).withSelfRel();
-                    resource.add(selfLink);
-                    return resource;
-                })
-                .collect(Collectors.toList());
+        Link selfLink = linkTo(methodOn(ItemController.class).getAllItems(pageable)).withSelfRel();
 
-        Link selfLink = linkTo(methodOn(ItemController.class)
-                .getAllItems(pageable)).withSelfRel();
-
-        Link nextLink = itemsPage.hasNext() ?
-                linkTo(methodOn(ItemController.class)
-                        .getAllItems(pageable.next())).withRel("next") : null;
-
-        Link prevLink = itemsPage.hasPrevious() ?
-                linkTo(methodOn(ItemController.class)
-                        .getAllItems(pageable.previousOrFirst())).withRel("prev") : null;
-
-        PagedModel<EntityModel<Item>> pagedModel = PagedModel.of(
-                itemResources,
-                new PagedModel.PageMetadata(
-                        itemsPage.getSize(),
-                        itemsPage.getNumber(),
-                        itemsPage.getTotalElements(),
-                        itemsPage.getTotalPages()
-                ),
-                Stream.of(selfLink, nextLink, prevLink)
-                        .filter(Objects::nonNull)
-                        .toList()
-        );
-
-        return ResponseEntity.ok(pagedModel);
+        return ResponseEntity.ok(HateoasUtil.toPagedModel(
+                itemsPage,
+                pageable,
+                HateoasUtil::toEntityModel,
+                selfLink
+        ));
     }
 
     @GetMapping("/container/{id}")
     public ResponseEntity<PagedModel<EntityModel<Item>>> getAllItemsByContainerId(@PathVariable UUID id, Pageable pageable) {
-        logger.info("GET request on /api/items/container/{} with parameters: {}", id, pageable.toString());
+        logger.info("GET request on /api/items/container/{} with parameters: {}", id, pageable);
 
         Page<Item> itemsPage = itemService.getAllItemsByContainerId(id, pageable);
 
-        List<EntityModel<Item>> itemResources = itemsPage.stream()
-                .map(item -> {
-                    EntityModel<Item> resource = EntityModel.of(item);
-                    Link selfLink = linkTo(methodOn(ItemController.class)
-                            .getItemById(item.getId())).withSelfRel();
-                    resource.add(selfLink);
-                    return resource;
-                })
-                .collect(Collectors.toList());
+        Link selfLink = linkTo(methodOn(ItemController.class).getAllItemsByContainerId(id, pageable)).withSelfRel();
 
-        Link selfLink = linkTo(methodOn(ItemController.class)
-                .getAllItems(pageable)).withSelfRel();
-
-        Link nextLink = itemsPage.hasNext() ?
-                linkTo(methodOn(ItemController.class)
-                        .getAllItems(pageable.next())).withRel("next") : null;
-
-        Link prevLink = itemsPage.hasPrevious() ?
-                linkTo(methodOn(ItemController.class)
-                        .getAllItems(pageable.previousOrFirst())).withRel("prev") : null;
-
-        PagedModel<EntityModel<Item>> pagedModel = PagedModel.of(
-                itemResources,
-                new PagedModel.PageMetadata(
-                        itemsPage.getSize(),
-                        itemsPage.getNumber(),
-                        itemsPage.getTotalElements(),
-                        itemsPage.getTotalPages()
-                ),
-                Stream.of(selfLink, nextLink, prevLink)
-                        .filter(Objects::nonNull)
-                        .toList()
-        );
-
-        return ResponseEntity.ok(pagedModel);
+        return ResponseEntity.ok(HateoasUtil.toPagedModel(
+                itemsPage,
+                pageable,
+                HateoasUtil::toEntityModel,
+                selfLink
+        ));
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Item>> getItemById(@PathVariable UUID id) {

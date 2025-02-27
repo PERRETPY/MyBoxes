@@ -1,12 +1,12 @@
-package fr.perretpy.MyBoxes.service;
+package fr.perretpy.myBoxes.service;
 
-import fr.perretpy.MyBoxes.exception.InvalidPageRequestException;
-import fr.perretpy.MyBoxes.exception.InvalidParameterException;
-import fr.perretpy.MyBoxes.exception.ResourceNotFoundException;
-import fr.perretpy.MyBoxes.model.Item;
-import fr.perretpy.MyBoxes.model.Container;
-import fr.perretpy.MyBoxes.repository.ItemRepository;
-import fr.perretpy.MyBoxes.repository.ContainerRepository;
+import fr.perretpy.myBoxes.exception.InvalidPageRequestException;
+import fr.perretpy.myBoxes.exception.InvalidParameterException;
+import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
+import fr.perretpy.myBoxes.model.Item;
+import fr.perretpy.myBoxes.model.Container;
+import fr.perretpy.myBoxes.repository.ItemRepository;
+import fr.perretpy.myBoxes.repository.ContainerRepository;
 import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class ItemService {
 
     public Item updateItem(UUID id, Item item) throws InvalidParameterException {
         Optional<Item> optionalExistedItem = getItem(id);
-        Item existedItem = new Item();
+        Item existedItem;
         if (optionalExistedItem.isPresent()) {
             existedItem = optionalExistedItem.get();
         }else {

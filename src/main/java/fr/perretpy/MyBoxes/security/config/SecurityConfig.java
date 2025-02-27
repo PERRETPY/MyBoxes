@@ -1,4 +1,4 @@
-package fr.perretpy.MyBoxes.security.config;
+package fr.perretpy.myBoxes.security.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-    CorsConfig corsConfig;
+    private final CorsConfig corsConfig;
 
     private final AuthorizeRequestConfig authorizeRequestConfig;
 

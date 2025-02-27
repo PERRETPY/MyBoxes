@@ -1,5 +1,6 @@
-package fr.perretpy.MyBoxes.security.config;
+package fr.perretpy.myBoxes.security.config;
 
+import fr.perretpy.myBoxes.exception.InvalidParameterException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -23,22 +24,42 @@ public class KeycloakJwtAuthenticationConverter implements Converter<Jwt, Collec
         // Récupérer les rôles dans realm_access
         Map<String, Object> realmAccess = jwt.getClaim("realm_access");
         if (realmAccess != null && realmAccess.containsKey("roles")) {
-            List<String> roles = (List<String>) realmAccess.get("roles");
-            authorities.addAll(roles.stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                    .toList());
+            Object rolesObj = realmAccess.get("roles");
+            if (rolesObj instanceof List<?> rawList) {
+                if (!rawList.isEmpty() && rawList.getFirst() instanceof String) {
+                    List<String> roles = rawList.stream()
+                            .map(Object::toString)
+                            .toList();
+
+                    authorities.addAll(roles.stream()
+                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                            .toList());
+                }
+            } else {
+             throw new InvalidParameterException("role not found");
+            }
         }
 
         // Récupérer les rôles dans resource_access
         Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
         if (resourceAccess != null && resourceAccess.containsKey(clientId)) {
-            Map<String, Object> clientRoles = (Map<String, Object>) resourceAccess.get(clientId);
-            if (clientRoles.containsKey("roles")) {
-                List<String> roles = (List<String>) clientRoles.get("roles");
-                authorities.addAll(roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .toList());
+            Object clientRolesObj = resourceAccess.get(clientId);
+            if (clientRolesObj instanceof Map<?, ?> clientRoles) {
+
+                Object rolesObj = clientRoles.get("roles");
+                if (rolesObj instanceof List<?> rawList) {
+                    if (!rawList.isEmpty() && rawList.getFirst() instanceof String) {
+                        List<String> roles = rawList.stream()
+                                .map(Object::toString)
+                                .toList();
+
+                        authorities.addAll(roles.stream()
+                                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                                .toList());
+                    }
+                }
             }
+
         }
         return authorities;
     }

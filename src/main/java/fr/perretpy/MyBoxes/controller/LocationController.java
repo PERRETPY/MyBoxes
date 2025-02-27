@@ -1,8 +1,9 @@
-package fr.perretpy.MyBoxes.controller;
+package fr.perretpy.myBoxes.controller;
 
-import fr.perretpy.MyBoxes.exception.ResourceNotFoundException;
-import fr.perretpy.MyBoxes.model.Location;
-import fr.perretpy.MyBoxes.service.LocationService;
+import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
+import fr.perretpy.myBoxes.model.Location;
+import fr.perretpy.myBoxes.service.LocationService;
+import fr.perretpy.myBoxes.util.HateoasUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -41,50 +38,19 @@ public class LocationController {
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Location>>> getAllLocations(Pageable pageable) {
-        logger.info("GET request on /api/locations with parameters: {}", pageable.toString());
+        logger.info("GET request on /api/locations with parameters: {}", pageable);
 
         Page<Location> locationsPage = locationService.getAllLocations(pageable);
 
-        List<EntityModel<Location>> locationResources = locationsPage.stream()
-                .map(location -> {
-                    EntityModel<Location> resource = EntityModel.of(location);
-                    Link selfLink = linkTo(methodOn(LocationController.class)
-                            .getLocationById(location.getId())).withSelfRel();
-                    Link containerListLink = linkTo(methodOn(ContainerController.class)
-                            .getAllContainersByLocationId(location.getId(), pageable)).withRel("ContainerList");
-                    resource.add(selfLink);
-                    resource.add(containerListLink);
-                    return resource;
-                })
-                .collect(Collectors.toList());
+        Link selfLink = linkTo(methodOn(LocationController.class).getAllLocations(pageable)).withSelfRel();
 
-        Link selfLink = linkTo(methodOn(LocationController.class)
-                .getAllLocations(pageable)).withSelfRel();
-
-        Link nextLink = locationsPage.hasNext() ?
-                linkTo(methodOn(LocationController.class)
-                        .getAllLocations(pageable.next())).withRel("next") : null;
-
-        Link prevLink = locationsPage.hasPrevious() ?
-                linkTo(methodOn(LocationController.class)
-                        .getAllLocations(pageable.previousOrFirst())).withRel("prev") : null;
-
-        PagedModel<EntityModel<Location>> pagedModel = PagedModel.of(
-                locationResources,
-                new PagedModel.PageMetadata(
-                        locationsPage.getSize(),
-                        locationsPage.getNumber(),
-                        locationsPage.getTotalElements(),
-                        locationsPage.getTotalPages()
-                ),
-                Stream.of(selfLink, nextLink, prevLink)
-                        .filter(Objects::nonNull)
-                        .toList()
-        );
-
-        return ResponseEntity.ok(pagedModel);
+        return ResponseEntity.ok(HateoasUtil.toPagedModel(
+                locationsPage,
+                pageable,
+                HateoasUtil::toEntityModel,
+                selfLink
+        ));
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Location>> getLocationById(@PathVariable UUID id) {
@@ -131,4 +97,5 @@ public class LocationController {
 
         return ResponseEntity.noContent().build();
     }
+
 }
