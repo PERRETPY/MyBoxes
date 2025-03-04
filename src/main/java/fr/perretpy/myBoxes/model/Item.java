@@ -15,7 +15,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Item extends RepresentationModel<Item> {
+public class Item  extends RepresentationModel<Item> implements GenericModel<Item, UUID> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

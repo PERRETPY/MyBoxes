@@ -33,14 +33,6 @@ public class ContainerService extends GenericService<Container, UUID> {
         this.itemService = itemService;
     }
 
-    public Page<Container> getAllContainers(Pageable pageable) throws InvalidPageRequestException {
-        if (pageable.getPageNumber() < 0 || pageable.getPageSize() <= 0) {
-            throw new InvalidPageRequestException("Page ou taille de page invalide");
-        }
-
-        return containerRepository.findAll(pageable);
-    }
-
     public Page<Container> getAllContainersByLocationId(UUID id, Pageable pageable) throws InvalidPageRequestException {
         if (pageable.getPageNumber() < 0 || pageable.getPageSize() <= 0) {
             throw new InvalidPageRequestException("Page ou taille de page invalide");
@@ -56,15 +48,8 @@ public class ContainerService extends GenericService<Container, UUID> {
         return containerRepository.findAllByLocationId(id, pageable);
     }
 
-
-    public Optional<Container> getContainer(UUID id) throws InvalidParameterException {
-        if (id == null) {
-            throw new InvalidParameterException("ID null");
-        }
-        return this.containerRepository.findById(id);
-    }
-
-    public Container createContainer(Container container) throws InvalidParameterException {
+    @Override
+    public Container create(Container container) throws InvalidParameterException {
         if(container == null) {
             throw new InvalidParameterException("container cannot be null");
         }
@@ -75,8 +60,9 @@ public class ContainerService extends GenericService<Container, UUID> {
         return this.containerRepository.save(container);
     }
 
-    public Container updateContainer(UUID id, Container container) throws InvalidParameterException {
-        return update(id, container, (existing, newEntity) -> {
+    @Override
+    public Container update(UUID id, Container container) throws InvalidParameterException {
+        return updateWithUpdater(id, container, (existing, newEntity) -> {
 
             if(newEntity.getName() != null && !newEntity.getName().isBlank()) {
                 existing.setName(newEntity.getName());
@@ -95,7 +81,8 @@ public class ContainerService extends GenericService<Container, UUID> {
     }
 
     @Transactional
-    public void deleteContainer(UUID id) throws InvalidParameterException, ResourceNotFoundException {
+    @Override
+    public void delete(UUID id) throws InvalidParameterException, ResourceNotFoundException {
         if (id == null) {
             throw new InvalidParameterException("ID null");
         }
@@ -116,6 +103,6 @@ public class ContainerService extends GenericService<Container, UUID> {
             throw new ResourceNotFoundException("Location not found");
         }
         Iterable<Container> containerIterable = this.containerRepository.findAllByLocationId(id);
-        containerIterable.forEach(container -> this.deleteContainer(container.getId()));
+        containerIterable.forEach(container -> this.delete(container.getId()));
     }
 }

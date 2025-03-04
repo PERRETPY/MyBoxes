@@ -9,7 +9,10 @@ import fr.perretpy.myBoxes.model.Location;
 import org.springframework.hateoas.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,6 +22,24 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class HateoasUtil {
+
+    private static final Map<Class<?>, Function<Object, EntityModel<?>>> entityModelMappers = new HashMap<>();
+
+    static {
+        entityModelMappers.put(Location.class, entity -> toLocationModel((Location) entity));
+        entityModelMappers.put(Container.class, entity -> toContainerModel((Container) entity));
+        entityModelMappers.put(Item.class, entity -> toItemModel((Item) entity));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> EntityModel<T> toEntityModel(T entity) {
+        Function<Object, EntityModel<?>> mapper = entityModelMappers.get(entity.getClass());
+        if (mapper != null) {
+            return (EntityModel<T>) mapper.apply(entity);
+        }
+        throw new IllegalArgumentException("No HATEOAS mapper found for " + entity.getClass().getSimpleName());
+    }
+
     public static <T> PagedModel<EntityModel<T>> toPagedModel(
             Page<T> page,
             Pageable pageable,
@@ -49,24 +70,24 @@ public class HateoasUtil {
         );
     }
 
-    public static EntityModel<Location> toEntityModel(Location location) {
+    private static EntityModel<Location> toLocationModel(Location location) {
         EntityModel<Location> resource = EntityModel.of(location);
-        resource.add(linkTo(methodOn(LocationController.class).getLocationById(location.getId())).withSelfRel());
+        resource.add(linkTo(methodOn(LocationController.class).getById(location.getId())).withSelfRel());
         resource.add(linkTo(methodOn(ContainerController.class)
                 .getAllContainersByLocationId(location.getId(), Pageable.unpaged())).withRel("ContainerList"));
         return resource;
     }
 
-    public static EntityModel<Container> toEntityModel(Container container) {
+    private static EntityModel<Container> toContainerModel(Container container) {
         EntityModel<Container> resource = EntityModel.of(container);
-        resource.add(linkTo(methodOn(ContainerController.class).getContainerById(container.getId())).withSelfRel());
+        resource.add(linkTo(methodOn(ContainerController.class).getById(container.getId())).withSelfRel());
         resource.add(linkTo(methodOn(ItemController.class).getAllItemsByContainerId(container.getId(), Pageable.unpaged())).withRel("ItemList"));
         return resource;
     }
 
-    public static EntityModel<Item> toEntityModel(Item item) {
+    private static EntityModel<Item> toItemModel(Item item) {
         EntityModel<Item> resource = EntityModel.of(item);
-        resource.add(linkTo(methodOn(ItemController.class).getItemById(item.getId())).withSelfRel());
+        resource.add(linkTo(methodOn(ItemController.class).getById(item.getId())).withSelfRel());
         return resource;
     }
 }
