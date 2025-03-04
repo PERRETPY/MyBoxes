@@ -12,8 +12,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location extends RepresentationModel<Location> {
-
+public class Location extends RepresentationModel<Location> implements GenericModel<Location, UUID> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)

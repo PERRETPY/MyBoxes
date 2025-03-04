@@ -5,6 +5,7 @@ import fr.perretpy.myBoxes.exception.InvalidParameterException;
 import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
 import fr.perretpy.myBoxes.model.Item;
 import fr.perretpy.myBoxes.model.Container;
+import fr.perretpy.myBoxes.model.Location;
 import fr.perretpy.myBoxes.repository.ItemRepository;
 import fr.perretpy.myBoxes.repository.ContainerRepository;
 import jakarta.transaction.Transactional;
@@ -18,22 +19,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class ItemService {
+public class ItemService extends GenericService<Item, UUID> {
     private final ItemRepository itemRepository;
     private final ContainerRepository containerRepository;
 
     @Autowired
     public ItemService(ItemRepository itemRepository, ContainerRepository containerRepository) {
+        super(itemRepository);
         this.itemRepository = itemRepository;
         this.containerRepository = containerRepository;
-    }
-
-    public Page<Item> getAllItems(Pageable pageable) throws InvalidPageRequestException {
-        if (pageable.getPageNumber() < 0 || pageable.getPageSize() <= 0) {
-            throw new InvalidPageRequestException("Page ou taille de page invalide");
-        }
-
-        return itemRepository.findAll(pageable);
     }
 
     public Page<Item> getAllItemsByContainerId(UUID id, Pageable pageable) throws InvalidPageRequestException {
@@ -51,14 +45,7 @@ public class ItemService {
         return itemRepository.findAllByContainerId(id, pageable);
     }
 
-    public Optional<Item> getItem(UUID id) throws InvalidParameterException {
-        if (id == null) {
-            throw new InvalidParameterException("ID null");
-        }
-        return this.itemRepository.findById(id);
-    }
-
-    public Item createItem(Item item) throws InvalidParameterException {
+    public Item create(Item item) throws InvalidParameterException {
         if(item == null) {
             throw new InvalidParameterException("item cannot be null");
         }
@@ -69,34 +56,26 @@ public class ItemService {
         return this.itemRepository.save(item);
     }
 
-    public Item updateItem(UUID id, Item item) throws InvalidParameterException {
-        Optional<Item> optionalExistedItem = getItem(id);
-        Item existedItem;
-        if (optionalExistedItem.isPresent()) {
-            existedItem = optionalExistedItem.get();
-        }else {
-            throw new InvalidParameterException("room id doesn't exist");
-        }
-
-        if(item.getName() != null && !item.getName().isBlank()) {
-            existedItem.setName(item.getName());
-        }
-
-        if(item.getDescription() != null && !item.getDescription().isBlank()) {
-            existedItem.setDescription(item.getDescription());
-        }
-
-        if(item.getContainer().getId() != null) {
-            Container container = containerRepository.findById(item.getContainer().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Container not found"));
-            existedItem.setContainer(container);
-        }
-
-        return itemRepository.save(existedItem);
+    @Override
+    public Item update(UUID id, Item item) throws InvalidParameterException {
+        return updateWithUpdater(id, item, (existing, newEntity) -> {
+            if (newEntity.getName() != null && !newEntity.getName().isBlank()) {
+                existing.setName(newEntity.getName());
+            }
+            if (newEntity.getDescription() != null && !newEntity.getDescription().isBlank()) {
+                existing.setDescription(newEntity.getDescription());
+            }
+            if(newEntity.getContainer().getId() != null) {
+                Container container = containerRepository.findById(item.getContainer().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Container not found"));
+                existing.setContainer(container);
+            }
+        });
     }
 
     @Transactional
-    public void deleteItem(UUID id) throws InvalidParameterException, ResourceNotFoundException {
+    @Override
+    public void delete(UUID id) throws InvalidParameterException, ResourceNotFoundException {
         if (id == null) {
             throw new InvalidParameterException("ID null");
         }
@@ -117,6 +96,6 @@ public class ItemService {
             throw new ResourceNotFoundException("Container not found");
         }
         Iterable<Item> itemIterable = this.itemRepository.findAllByContainerId(id);
-        itemIterable.forEach(item -> this.deleteItem(item.getId()));
+        itemIterable.forEach(item -> this.delete(item.getId()));
     }
 }
