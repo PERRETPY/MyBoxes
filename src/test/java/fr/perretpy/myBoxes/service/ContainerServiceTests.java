@@ -125,31 +125,31 @@ public class ContainerServiceTests {
 
      // deleteLocation TEST
 
-    /*@Test
+    @Test
     void test_deleteLocation_WhenValidId_ShouldCallContainerDeleteCascadeAndDeleteRepository() {
         Location location = new Location(UUID.randomUUID(), "Garage", "Description");
+        Container container = new Container(UUID.randomUUID(), "Ancien nom", "Boitte", location);
 
-        when(locationRepository.findById(location.getId())).thenReturn(Optional.of(location));
+        when(containerRepository.findById(container.getId())).thenReturn(Optional.of(container));
 
-        locationService.delete(location.getId());
+        containerService.delete(container.getId());
 
-        verify(locationRepository, times(1)).findById(location.getId());
-        verify(containerService, times(1)).deleteContainerByLocationId(location.getId());
-        verify(locationRepository, times(1)).delete(location);
+        verify(containerRepository, times(1)).findById(container.getId());
+        verify(itemService, times(1)).deleteItemByContainerId(container.getId());
+        verify(containerRepository, times(1)).delete(container);
     }
 
     @Test
     void test_deleteLocation_WhenNoExistingId_ShouldReturnException() {
         Location location = new Location(UUID.randomUUID(), "Garage", "Description");
+        Container container = new Container(UUID.randomUUID(), "Ancien nom", "Boitte", location);
 
-        when(locationRepository.findById(location.getId())).thenReturn(Optional.empty());
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> containerService.delete(container.getId()));
 
-        Exception exception = assertThrows(ResourceNotFoundException.class, () -> locationService.delete(location.getId()));
+        assertEquals(exception.getMessage(), "Container not found");
 
-        assertEquals(exception.getMessage(), "Location not found");
-
-        verify(locationRepository, times(1)).findById(location.getId());
-        verify(containerService, times(0)).deleteContainerByLocationId(location.getId());
-        verify(locationRepository, times(0)).delete(location);
-    }*/
+        verify(containerRepository, times(1)).findById(container.getId());
+        verify(itemService, times(0)).deleteItemByContainerId(container.getId());
+        verify(containerRepository, times(0)).delete(container);
+    }
 }
