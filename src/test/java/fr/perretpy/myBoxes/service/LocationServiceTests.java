@@ -21,7 +21,7 @@ import org.springframework.data.domain.*;
 
 @ExtendWith(MockitoExtension.class)
 public class LocationServiceTests {
-   /* @Mock
+    @Mock
     ContainerService containerService;
 
     @Mock
@@ -41,7 +41,7 @@ public class LocationServiceTests {
         Page<Location> expectedPage = new PageImpl<>(locations, pageable, locations.size());
 
         when(locationRepository.findAll(pageable)).thenReturn(expectedPage);
-        Page<Location> result = locationService.getAllLocations(pageable);
+        Page<Location> result = locationService.getAll(pageable);
         assertNotNull(result);
         assertEquals(2, result.getContent().size());
         assertEquals("Garage", result.getContent().get(0).getName());
@@ -57,7 +57,7 @@ public class LocationServiceTests {
         Page<Location> expectedPage = new PageImpl<>(locations, pageable, 0);
 
         when(locationRepository.findAll(pageable)).thenReturn(expectedPage);
-        Page<Location> result = locationService.getAllLocations(pageable);
+        Page<Location> result = locationService.getAll(pageable);
         assertNotNull(result);
         assertEquals(0, result.getContent().size());
 
@@ -74,7 +74,7 @@ public class LocationServiceTests {
         when(locationRepository.findById(prevLocation.getId())).thenReturn(Optional.of(prevLocation));
         when(locationRepository.save(any(Location.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Location updatedLocation = locationService.updateLocation(prevLocation.getId(), newLocation);
+        Location updatedLocation = locationService.update(prevLocation.getId(), newLocation);
 
         assertEquals(newLocation.getName(), updatedLocation.getName());
         assertEquals(newLocation.getDescription(), updatedLocation.getDescription());
@@ -90,7 +90,7 @@ public class LocationServiceTests {
 
         when(locationRepository.findById(prevLocation.getId())).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(InvalidParameterException.class, () -> locationService.updateLocation(prevLocation.getId(), newLocation));
+        Exception exception = assertThrows(InvalidParameterException.class, () -> locationService.update(prevLocation.getId(), newLocation));
 
         assertEquals(exception.getMessage(), "Entity with ID " + prevLocation.getId() + " doesn't exist");
 
@@ -106,7 +106,7 @@ public class LocationServiceTests {
 
         when(locationRepository.findById(location.getId())).thenReturn(Optional.of(location));
 
-        locationService.deleteLocation(location.getId());
+        locationService.delete(location.getId());
 
         verify(locationRepository, times(1)).findById(location.getId());
         verify(containerService, times(1)).deleteContainerByLocationId(location.getId());
@@ -119,12 +119,12 @@ public class LocationServiceTests {
 
         when(locationRepository.findById(location.getId())).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(ResourceNotFoundException.class, () -> locationService.deleteLocation(location.getId()));
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> locationService.delete(location.getId()));
 
         assertEquals(exception.getMessage(), "Location not found");
 
         verify(locationRepository, times(1)).findById(location.getId());
         verify(containerService, times(0)).deleteContainerByLocationId(location.getId());
         verify(locationRepository, times(0)).delete(location);
-    }*/
+    }
 }
