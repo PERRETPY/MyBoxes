@@ -5,7 +5,6 @@ import fr.perretpy.myBoxes.exception.InvalidParameterException;
 import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
 import fr.perretpy.myBoxes.model.Item;
 import fr.perretpy.myBoxes.model.Container;
-import fr.perretpy.myBoxes.model.Location;
 import fr.perretpy.myBoxes.repository.ItemRepository;
 import fr.perretpy.myBoxes.repository.ContainerRepository;
 import jakarta.transaction.Transactional;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,14 +44,14 @@ public class ItemService extends GenericService<Item, UUID> {
     }
 
     public Item create(Item item) throws InvalidParameterException {
-        if(item == null) {
-            throw new InvalidParameterException("item cannot be null");
-        }
-        if(item.getName().isBlank()) {
-            throw new InvalidParameterException("item name cannot be null");
-        }
-        item.setId(null);
-        return this.itemRepository.save(item);
+        return createWithCreater(item, (newItem) -> {
+            if(newItem == null) {
+                throw new InvalidParameterException("item cannot be null");
+            }
+            if(newItem.getName().isBlank()) {
+                throw new InvalidParameterException("item name cannot be null");
+            }
+        });
     }
 
     @Override

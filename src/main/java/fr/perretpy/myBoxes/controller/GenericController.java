@@ -4,7 +4,6 @@ import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
 import fr.perretpy.myBoxes.model.GenericModel;
 import fr.perretpy.myBoxes.service.GenericService;
 import fr.perretpy.myBoxes.util.HateoasUtil;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -16,23 +15,35 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.util.UUID;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@RequiredArgsConstructor
 public abstract class GenericController<S extends GenericService<T, ID>, T extends GenericModel<T, ID>, ID> {
     public final S service;
+    public final String requestMapping;
 
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    public GenericController(S service) {
+        this.service = service;
+        Class<?> controllerClass = this.getClass();
+        if (controllerClass.isAnnotationPresent(RequestMapping.class)) {
+            RequestMapping mapping = controllerClass.getAnnotation(RequestMapping.class);
+            String[] paths = mapping.value();
+            if (paths.length > 0) {
+                this.requestMapping = paths[0];
+            }else {
+                this.requestMapping = "no request mapping";
+            }
+        }else {
+            this.requestMapping = "no request mapping";
+        }
+    }
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<T>>> getAll(Pageable pageable) {
-        //logger.info("GET request on /api/locations with parameters: {}", pageable);
+        logger.info(this.getClass().getName());
+        logger.info("GET request on {} with parameters: {}", requestMapping, pageable);
 
         Page<T> tPages = service.getAll(pageable);
 
@@ -47,8 +58,9 @@ public abstract class GenericController<S extends GenericService<T, ID>, T exten
     }
 
     @GetMapping("/{id}")
+    @SuppressWarnings("unchecked")
     public ResponseEntity<EntityModel<T>> getById(@PathVariable ID id) {
-        //logger.info("GET request on /api/locations/{}", id);
+        logger.info("GET request on {}/{}", requestMapping, id);
         T object = service.get(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Location not found"));
 
@@ -59,8 +71,9 @@ public abstract class GenericController<S extends GenericService<T, ID>, T exten
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<T>> createLocation(@RequestBody T object) {
-        //logger.info("POST request on /api/locations");
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<EntityModel<T>> create(@RequestBody T object) {
+        logger.info("POST request on {}", requestMapping);
 
         T savedObject = service.create(object);
 
@@ -71,8 +84,9 @@ public abstract class GenericController<S extends GenericService<T, ID>, T exten
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<T>> updateLocation(@PathVariable ID id, @RequestBody T object) {
-        logger.info("PUT request on /api/locations/{}", id);
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<EntityModel<T>> update(@PathVariable ID id, @RequestBody T object) {
+        logger.info("PUT request on {}/{}", requestMapping, id);
 
         T updatedObject = service.update(id, object);
 
@@ -84,7 +98,7 @@ public abstract class GenericController<S extends GenericService<T, ID>, T exten
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") ID id) {
-        //logger.info("DELETE request on /api/locations/{}", id);
+        logger.info("DELETE request on {}/{}", requestMapping, id);
 
         service.delete(id);
 
