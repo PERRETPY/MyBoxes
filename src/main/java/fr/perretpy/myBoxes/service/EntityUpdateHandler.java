@@ -1,6 +1,6 @@
 package fr.perretpy.myBoxes.service;
 
 @FunctionalInterface
-public interface EntityCrudHandler<T> {
+public interface EntityUpdateHandler<T> {
     void updateFields(T existingEntity, T newEntity);
 }

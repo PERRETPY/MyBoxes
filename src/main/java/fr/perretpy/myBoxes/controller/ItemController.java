@@ -3,8 +3,6 @@ package fr.perretpy.myBoxes.controller;
 import fr.perretpy.myBoxes.model.Item;
 import fr.perretpy.myBoxes.service.ItemService;
 import fr.perretpy.myBoxes.util.HateoasUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.EntityModel;
@@ -25,9 +23,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/api/items")
 @PreAuthorize("hasAuthority('ROLE_myboxes_admin')")
 public class ItemController extends GenericController<ItemService, Item, UUID>{
-    private final Logger logger = LoggerFactory.getLogger(ItemController.class);
-
-
     @Autowired
     public ItemController(ItemService itemService) {
         super(itemService);

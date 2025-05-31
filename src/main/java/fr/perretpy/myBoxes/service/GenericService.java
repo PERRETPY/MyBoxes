@@ -26,23 +26,31 @@ public abstract class GenericService<T extends GenericModel<T, ID>, ID> {
         return this.repository.findById(id);
     }
 
-    public T create(T newObject) {
-
+    private T creater(T newObject) throws InvalidParameterException {
         if(newObject == null) {
-            throw new InvalidParameterException("location cannot be null");
+            throw new InvalidParameterException("create object cannot be null");
         }
-        //TODO
-        /*
-        if(location.getName().isBlank()) {
-            throw new InvalidParameterException("location name cannot be null");
-        }
-         */
         newObject.setId(null);
-
-        return this.repository.save(newObject);
+        return newObject;
     }
 
-    public T update(ID id, T newEntity) {
+    public T create(T newEntity) throws InvalidParameterException {
+        return this.repository.save(creater(newEntity));
+    }
+
+    protected T createWithCreater(T newEntity, EntityCreateHandler<T> creater) {
+        newEntity = creater(newEntity);
+        creater.createFields(newEntity);
+        return repository.save(newEntity);
+    }
+
+    public T update(ID id, T newEntity) throws InvalidParameterException{
+        if(newEntity == null) {
+            throw new InvalidParameterException("update object cannot be null");
+        }
+        if(id == null) {
+            throw new InvalidParameterException("id cannot be null");
+        }
         Optional<T> optionalEntity = repository.findById(id);
         T existedEntity;
         if(optionalEntity.isPresent()) {
@@ -55,14 +63,13 @@ public abstract class GenericService<T extends GenericModel<T, ID>, ID> {
         return repository.save(newEntity);
        }
 
-    protected T updateWithUpdater(ID id, T newEntity, EntityCrudHandler<T> updater) {
+    protected T updateWithUpdater(ID id, T newEntity, EntityUpdateHandler<T> updater) {
         return repository.findById(id)
                 .map(existingEntity -> {
                     updater.updateFields(existingEntity, newEntity);
                     return repository.save(existingEntity);
                 })
                 .orElseThrow(() -> new InvalidParameterException("Entity with ID " + id + " doesn't exist"));
-
     }
 
     public void delete(ID id) {

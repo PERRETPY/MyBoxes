@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
@@ -50,14 +49,15 @@ public class ContainerService extends GenericService<Container, UUID> {
 
     @Override
     public Container create(Container container) throws InvalidParameterException {
-        if(container == null) {
-            throw new InvalidParameterException("container cannot be null");
-        }
-        if(container.getName().isBlank()) {
-            throw new InvalidParameterException("container name cannot be null");
-        }
-        container.setId(null);
-        return this.containerRepository.save(container);
+        return createWithCreater(container, (newContainer) -> {
+            if(newContainer == null) {
+                throw new InvalidParameterException("container cannot be null");
+            }
+            if(newContainer.getName().isBlank()) {
+                throw new InvalidParameterException("container name cannot be null");
+            }
+            newContainer.setId(null);
+        });
     }
 
     @Override

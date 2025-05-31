@@ -24,14 +24,14 @@ public class LocationService extends GenericService<Location, UUID> {
 
     @Override
     public Location create(Location location) throws InvalidParameterException {
-        if(location == null) {
-            throw new InvalidParameterException("location cannot be null");
-        }
-        if(location.getName().isBlank()) {
-            throw new InvalidParameterException("location name cannot be null");
-        }
-        location.setId(null);
-        return this.repository.save(location);
+        return createWithCreater(location, (newLocation) -> {
+            if(newLocation == null) {
+                throw new InvalidParameterException("location cannot be null");
+            }
+            if(newLocation.getName().isBlank()) {
+                throw new InvalidParameterException("location name cannot be null");
+            }
+        });
     }
 
     @Override
