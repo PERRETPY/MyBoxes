@@ -32,6 +32,8 @@ public class SearchController {
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<SearchResponseDto>>> search(@RequestParam("query") String q, Pageable pageable) {
+        logger.info("GET request on /api/search with query \" {} \" and parameters: {}", q, pageable);
+
         Page<SearchResponseDto> searchResponseDtoPage = searchService.globalSearch(q, pageable);
 
         Link selfLink = linkTo(methodOn(SearchController.class).search(q, pageable)).withSelfRel();

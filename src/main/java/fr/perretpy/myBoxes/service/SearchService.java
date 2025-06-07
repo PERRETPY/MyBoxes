@@ -30,6 +30,7 @@ public class SearchService {
         this.itemRepository = itemRepository;
     }
 
+    //TODO : json result page not correct (total elements, total pages, etc.)
     public Page<SearchResponseDto> globalSearch(String query, Pageable pageable) {
         int page = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
@@ -40,36 +41,36 @@ public class SearchService {
 
         int locationQuota = baseQuota + (remainder > 0 ? 1 : 0);
         int containerQuota = baseQuota + (remainder > 1 ? 1 : 0);
-        int itemQuota = baseQuota;
+
+        long totalElement = 0;
 
         Pageable locationPageable = PageRequest.of(page, locationQuota);
         Pageable containerPageable = PageRequest.of(page, containerQuota);
-        Pageable itemPageable = PageRequest.of(page, itemQuota);
+        Pageable itemPageable = PageRequest.of(page, baseQuota);
 
-        List<SearchResponseDto> results = new ArrayList<>();
-
-        List<Location> locations = locationRepository
-                .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, locationPageable)
-                .getContent();
-        results.addAll(locations.stream()
+        Page<Location> locationPage = locationRepository
+                .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, locationPageable);
+        List<SearchResponseDto> results = new ArrayList<>(locationPage.getContent().stream()
                 .map(SearchResponseDto::fromLocation)
                 .toList());
+        totalElement += locationPage.getTotalElements();
 
-        List<Container> containers = containerRepository
-                .findByNameContainingIgnoreCaseOrTypeContainingIgnoreCase(query, query, containerPageable)
-                .getContent();
-        results.addAll(containers.stream()
+        Page<Container> containerPage = containerRepository
+                .findByNameContainingIgnoreCaseOrTypeContainingIgnoreCase(query, query, containerPageable);
+        results.addAll(containerPage.getContent().stream()
                 .map(SearchResponseDto::fromContainer)
                 .toList());
+        totalElement += containerPage.getTotalElements();
 
-        List<Item> items = itemRepository
-                .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, itemPageable)
-                .getContent();
-        results.addAll(items.stream()
+        Page<Item> itemPage = itemRepository
+                .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, itemPageable);
+        results.addAll(itemPage.getContent().stream()
                 .map(SearchResponseDto::fromItem)
                 .toList());
+        totalElement += itemPage.getTotalElements();
 
-        return new PageImpl<>(results, pageable, results.size());
+        System.out.println(totalElement);
+        return new PageImpl<>(results, pageable, totalElement);
     }
 
 

@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.hateoas.server.core.Relation;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -46,5 +46,15 @@ public class SearchResponseDto {
                 item.getName(),
                 item.getDescription()
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SearchResponseDto that)) return false;
+        return Objects.equals(type, that.type) &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(description, that.description);
     }
 }
