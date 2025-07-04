@@ -96,4 +96,10 @@ public class ItemService extends GenericService<Item, UUID> {
         Iterable<Item> itemIterable = this.itemRepository.findAllByContainerId(id);
         itemIterable.forEach(item -> this.delete(item.getId()));
     }
+
+    @Override
+    public Page<Item> search(String query, Pageable pageable) {
+        ItemRepository itemRepository = (ItemRepository) repository;
+        return itemRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, pageable);
+    }
 }

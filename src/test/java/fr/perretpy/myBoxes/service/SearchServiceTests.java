@@ -64,7 +64,7 @@ public class SearchServiceTests {
         List<Container> containers = List.of(container1, container2, container3);
         Pageable containerPageable = PageRequest.of(0, 3);
         Page<Container> expectedPageContainer = new PageImpl<>(containers, containerPageable, 0);
-        when(containerRepository.findByNameContainingIgnoreCaseOrTypeContainingIgnoreCase(query, query, containerPageable)).thenReturn(expectedPageContainer);
+        when(containerRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, containerPageable)).thenReturn(expectedPageContainer);
 
         List<Item> items = List.of(item1, item2, item3);
         Pageable itemPageable = PageRequest.of(0, 3);
@@ -89,7 +89,7 @@ public class SearchServiceTests {
         assertEquals(result.getNumber(), globalPageable.getPageNumber());
 
         verify(locationRepository, times(1)).findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, locationPageable);
-        verify(containerRepository, times(1)).findByNameContainingIgnoreCaseOrTypeContainingIgnoreCase(query, query, containerPageable);
+        verify(containerRepository, times(1)).findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, containerPageable);
         verify(itemRepository, times(1)).findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, itemPageable);
     }
 }

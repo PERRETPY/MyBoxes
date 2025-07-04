@@ -56,7 +56,7 @@ public class SearchService {
         totalElement += locationPage.getTotalElements();
 
         Page<Container> containerPage = containerRepository
-                .findByNameContainingIgnoreCaseOrTypeContainingIgnoreCase(query, query, containerPageable);
+                .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, containerPageable);
         results.addAll(containerPage.getContent().stream()
                 .map(SearchResponseDto::fromContainer)
                 .toList());
@@ -72,6 +72,4 @@ public class SearchService {
         System.out.println(totalElement);
         return new PageImpl<>(results, pageable, totalElement);
     }
-
-
 }

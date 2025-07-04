@@ -87,7 +87,7 @@ public class ContainerServiceTests {
         Container updatedContainer = containerService.update(prevContainer.getId(), newContainer);
 
         assertEquals(newContainer.getName(), updatedContainer.getName());
-        assertEquals(newContainer.getType(), updatedContainer.getType());
+        assertEquals(newContainer.getDescription(), updatedContainer.getDescription());
         assertEquals(prevContainer.getId(), updatedContainer.getId());
 
         verify(containerRepository, times(1)).findById(prevContainer.getId());
