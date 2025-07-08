@@ -77,5 +77,7 @@ public abstract class GenericService<T extends GenericModel<T, ID>, ID> {
                 .orElseThrow(() -> new ResourceNotFoundException("Object not found"));
         repository.delete(object);
     }
+
+    public abstract Page<T> search(String query, Pageable pageable);
 }
 

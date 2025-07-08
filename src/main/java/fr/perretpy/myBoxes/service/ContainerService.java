@@ -68,8 +68,8 @@ public class ContainerService extends GenericService<Container, UUID> {
                 existing.setName(newEntity.getName());
             }
 
-            if(newEntity.getType() != null && !newEntity.getType().isBlank()) {
-                existing.setType(newEntity.getType());
+            if(newEntity.getDescription() != null && !newEntity.getDescription().isBlank()) {
+                existing.setDescription(newEntity.getDescription());
             }
 
             if(newEntity.getLocation().getId() != null) {
@@ -104,5 +104,13 @@ public class ContainerService extends GenericService<Container, UUID> {
         }
         Iterable<Container> containerIterable = this.containerRepository.findAllByLocationId(id);
         containerIterable.forEach(container -> this.delete(container.getId()));
+    }
+
+    @Override
+    public Page<Container> search(String query, Pageable pageable) {
+        ContainerRepository containerRepository = (ContainerRepository) repository;
+        Page<Container> test = containerRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, pageable);
+        System.out.println(test.getContent());
+        return test;
     }
 }

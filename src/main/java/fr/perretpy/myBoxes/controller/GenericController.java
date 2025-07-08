@@ -1,7 +1,10 @@
 package fr.perretpy.myBoxes.controller;
 
 import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
+import fr.perretpy.myBoxes.model.Container;
 import fr.perretpy.myBoxes.model.GenericModel;
+import fr.perretpy.myBoxes.model.Item;
+import fr.perretpy.myBoxes.model.Location;
 import fr.perretpy.myBoxes.service.GenericService;
 import fr.perretpy.myBoxes.util.HateoasUtil;
 import org.slf4j.Logger;
@@ -42,7 +45,6 @@ public abstract class GenericController<S extends GenericService<T, ID>, T exten
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<T>>> getAll(Pageable pageable) {
-        logger.info(this.getClass().getName());
         logger.info("GET request on {} with parameters: {}", requestMapping, pageable);
 
         Page<T> tPages = service.getAll(pageable);
@@ -103,5 +105,21 @@ public abstract class GenericController<S extends GenericService<T, ID>, T exten
         service.delete(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(params = "q")
+    public ResponseEntity<PagedModel<EntityModel<T>>> search(@RequestParam("q") String query, Pageable pageable) {
+        logger.info("GET request on {} with parameters: {} and {}", requestMapping, query, pageable);
+
+        Page<T> tPages = service.search(query, pageable);
+
+        Link selfLink = linkTo(methodOn(this.getClass()).getAll(pageable)).withSelfRel();
+
+        return ResponseEntity.ok(HateoasUtil.toPagedModel(
+                tPages,
+                pageable,
+                HateoasUtil::toEntityModel,
+                selfLink
+        ));
     }
 }

@@ -11,4 +11,6 @@ public interface ItemRepository extends JpaRepository<Item, UUID> {
     Iterable<Item> findAllByContainerId(UUID id);
 
     Page<Item> findAllByContainerId(UUID id, Pageable pageable);
+
+    Page<Item> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String queryName, String queryDescription, Pageable pageable);
 }

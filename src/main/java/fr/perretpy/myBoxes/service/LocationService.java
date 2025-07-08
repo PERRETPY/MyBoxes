@@ -7,6 +7,8 @@ import fr.perretpy.myBoxes.repository.LocationRepository;
 import jakarta.transaction.Transactional;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -58,5 +60,11 @@ public class LocationService extends GenericService<Location, UUID> {
 
         this.containerService.deleteContainerByLocationId(id);
         repository.delete(location);
+    }
+
+    @Override
+    public Page<Location> search(String query, Pageable pageable) {
+        LocationRepository locationRepository = (LocationRepository) repository;
+        return locationRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, pageable);
     }
 }

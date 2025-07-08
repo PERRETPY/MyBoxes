@@ -3,6 +3,7 @@ package fr.perretpy.myBoxes.util;
 import fr.perretpy.myBoxes.controller.ContainerController;
 import fr.perretpy.myBoxes.controller.ItemController;
 import fr.perretpy.myBoxes.controller.LocationController;
+import fr.perretpy.myBoxes.dto.SearchResponseDto;
 import fr.perretpy.myBoxes.model.Container;
 import fr.perretpy.myBoxes.model.Item;
 import fr.perretpy.myBoxes.model.Location;
@@ -29,6 +30,7 @@ public class HateoasUtil {
         entityModelMappers.put(Location.class, entity -> toLocationModel((Location) entity));
         entityModelMappers.put(Container.class, entity -> toContainerModel((Container) entity));
         entityModelMappers.put(Item.class, entity -> toItemModel((Item) entity));
+        entityModelMappers.put(SearchResponseDto.class, entity -> toSearchResponseDtoModel((SearchResponseDto) entity));
     }
 
     @SuppressWarnings("unchecked")
@@ -88,6 +90,19 @@ public class HateoasUtil {
     private static EntityModel<Item> toItemModel(Item item) {
         EntityModel<Item> resource = EntityModel.of(item);
         resource.add(linkTo(methodOn(ItemController.class).getById(item.getId())).withSelfRel());
+        return resource;
+    }
+
+    private static EntityModel<SearchResponseDto> toSearchResponseDtoModel(SearchResponseDto dto) {
+        EntityModel<SearchResponseDto> resource = EntityModel.of(dto);
+
+        switch (dto.getType()) {
+            case "location" -> resource.add(linkTo(methodOn(LocationController.class).getById(dto.getId())).withRel("location"));
+            case "container" -> resource.add(linkTo(methodOn(ContainerController.class).getById(dto.getId())).withRel("container"));
+            case "item" -> resource.add(linkTo(methodOn(ItemController.class).getById(dto.getId())).withRel("item"));
+            default -> throw new IllegalArgumentException("Unknown type: " + dto.getType());
+        }
+
         return resource;
     }
 }
