@@ -1,4 +1,4 @@
-package fr.perretpy.MyBoxes;
+package fr.perretpy.myBoxes;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
