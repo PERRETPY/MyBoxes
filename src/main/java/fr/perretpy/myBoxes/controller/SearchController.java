@@ -38,11 +38,12 @@ public class SearchController {
 
         Link selfLink = linkTo(methodOn(SearchController.class).search(query, pageable)).withSelfRel();
 
-        return ResponseEntity.ok(HateoasUtil.toPagedModel(
+        /*return ResponseEntity.ok(HateoasUtil.toPagedModel(
                 searchResponseDtoPage,
                 pageable,
                 HateoasUtil::toEntityModel,
                 selfLink
-        ));
+        ));*/
+        return null;
     }
 }

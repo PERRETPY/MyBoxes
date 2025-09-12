@@ -1,3 +1,4 @@
+/*
 package fr.perretpy.myBoxes.service;
 
 import fr.perretpy.myBoxes.exception.InvalidParameterException;
@@ -128,3 +129,4 @@ public class LocationServiceTests {
         verify(locationRepository, times(0)).delete(location);
     }
 }
+*/

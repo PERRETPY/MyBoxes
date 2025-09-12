@@ -5,6 +5,7 @@ import fr.perretpy.myBoxes.service.ContainerService;
 import fr.perretpy.myBoxes.util.HateoasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
@@ -28,19 +29,14 @@ public class ContainerController extends GenericController<ContainerService, Con
         super(containerService);
     }
 
-    @GetMapping("/location/{id}")
-    public ResponseEntity<PagedModel<EntityModel<Container>>> getAllContainersByLocationId(@PathVariable UUID id, Pageable pageable) {
-        logger.info("GET request on /api/containers/location/{} with parameters: {}", id, pageable);
+    @GetMapping("/parent/{id}")
+    public ResponseEntity<PagedModel<EntityModel<Container>>> getAllContainersByParentId(@PathVariable UUID id, Pageable pageable, PagedResourcesAssembler<Container> assembler) {
+        logger.info("GET request on /api/containers/parent/{} with parameters: {}", id, pageable);
 
-        Page<Container> containersPage = service.getAllContainersByLocationId(id, pageable);
+        Page<Container> containersPage = service.getAllContainersByParentId(id, pageable);
 
-        Link selfLink = linkTo(methodOn(ContainerController.class).getAllContainersByLocationId(id, pageable)).withSelfRel();
-
-        return ResponseEntity.ok(HateoasUtil.toPagedModel(
-                containersPage,
-                pageable,
-                HateoasUtil::toEntityModel,
-                selfLink
-        ));
+        return ResponseEntity.ok(
+                assembler.toModel(containersPage, HateoasUtil::toEntityModel)
+        );
     }
 }

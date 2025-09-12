@@ -4,9 +4,7 @@ import fr.perretpy.myBoxes.exception.InvalidPageRequestException;
 import fr.perretpy.myBoxes.exception.InvalidParameterException;
 import fr.perretpy.myBoxes.exception.ResourceNotFoundException;
 import fr.perretpy.myBoxes.model.Container;
-import fr.perretpy.myBoxes.model.Location;
 import fr.perretpy.myBoxes.repository.ContainerRepository;
-import fr.perretpy.myBoxes.repository.LocationRepository;
 import jakarta.transaction.Transactional;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +19,16 @@ import java.util.UUID;
 @Service
 public class ContainerService extends GenericService<Container, UUID> {
     private final ContainerRepository containerRepository;
-    private final LocationRepository locationRepository;
     private final ItemService itemService;
 
     @Autowired
-    public ContainerService(ContainerRepository containerRepository, LocationRepository locationRepository, ItemService itemService) {
+    public ContainerService(ContainerRepository containerRepository, ItemService itemService) {
         super(containerRepository);
         this.containerRepository = containerRepository;
-        this.locationRepository = locationRepository;
         this.itemService = itemService;
     }
 
-    public Page<Container> getAllContainersByLocationId(UUID id, Pageable pageable) throws InvalidPageRequestException {
+    public Page<Container> getAllContainersByParentId(UUID id, Pageable pageable) throws InvalidPageRequestException {
         if (pageable.getPageNumber() < 0 || pageable.getPageSize() <= 0) {
             throw new InvalidPageRequestException("Page ou taille de page invalide");
         }
@@ -40,11 +36,11 @@ public class ContainerService extends GenericService<Container, UUID> {
             throw new InvalidParameterException("ID null");
         }
 
-        if (!locationRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Location not found");
+        if (!containerRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Parent not found");
         }
 
-        return containerRepository.findAllByLocationId(id, pageable);
+        return containerRepository.findAllByParent_Id(id, pageable);
     }
 
     @Override
@@ -72,10 +68,10 @@ public class ContainerService extends GenericService<Container, UUID> {
                 existing.setDescription(newEntity.getDescription());
             }
 
-            if(newEntity.getLocation().getId() != null) {
-                Location location = locationRepository.findById(newEntity.getLocation().getId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Location not found"));
-                existing.setLocation(location);
+            if(newEntity.getParent().getId() != null) {
+                Container parent = containerRepository.findById(newEntity.getParent().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
+                existing.setParent(parent);
             }
         });
     }
@@ -90,19 +86,20 @@ public class ContainerService extends GenericService<Container, UUID> {
         Container container = containerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Container not found"));
         itemService.deleteItemByContainerId(id);
+        this.deleteContainerByParentId(id);
         containerRepository.delete(container);
     }
 
     @Transactional
-    public void deleteContainerByLocationId(UUID id) {
+    public void deleteContainerByParentId(UUID id) {
         if (id == null) {
             throw new InvalidParameterException("ID null");
         }
 
-        if (!locationRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Location not found");
+        if (!containerRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Parent not found");
         }
-        Iterable<Container> containerIterable = this.containerRepository.findAllByLocationId(id);
+        Iterable<Container> containerIterable = this.containerRepository.findAllByParentId(id);
         containerIterable.forEach(container -> this.delete(container.getId()));
     }
 

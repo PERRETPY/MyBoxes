@@ -30,7 +30,7 @@ public class Container  extends RepresentationModel<Container> implements Generi
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "location_fk")
-    private Location location;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "container_parent_fk")
+    private Container parent;
 }

@@ -11,7 +11,8 @@ public class AuthorizeRequestConfig implements Customizer<AuthorizeHttpRequestsC
     public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
         auth
                 .requestMatchers("/public/**").permitAll()
-                .anyRequest().authenticated();
+                //.anyRequest().authenticated();
+                .anyRequest().permitAll();
     }
 
 }

@@ -5,28 +5,6 @@ databaseChangeLog:
       author: PRT
       changes:
         - createTable:
-            tableName: location
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: description
-                  type: text
-
-  - changeSet:
-      id: 2
-      author: PRT
-      changes:
-        - createTable:
             tableName: container
             columns:
               - column:
@@ -46,16 +24,16 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: location_fk
+                  name: container_parent_fk
                   type: uuid
                   constraints:
-                    nullable: false
-                    references: location(id)
-                    foreignKeyName: fk_container_location
+                    nullable: true
+                    references: container(id)
+                    foreignKeyName: fk_container_container
                     deleteCascade: true
 
   - changeSet:
-      id: 3
+      id: 2
       author: PRT
       changes:
         - createTable:

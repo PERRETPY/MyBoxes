@@ -5,6 +5,7 @@ import fr.perretpy.myBoxes.service.ItemService;
 import fr.perretpy.myBoxes.util.HateoasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
@@ -29,18 +30,13 @@ public class ItemController extends GenericController<ItemService, Item, UUID>{
     }
 
     @GetMapping("/container/{id}")
-    public ResponseEntity<PagedModel<EntityModel<Item>>> getAllItemsByContainerId(@PathVariable UUID id, Pageable pageable) {
+    public ResponseEntity<PagedModel<EntityModel<Item>>> getAllItemsByContainerId(@PathVariable UUID id, Pageable pageable, PagedResourcesAssembler<Item> assembler) {
         logger.info("GET request on /api/items/container/{} with parameters: {}", id, pageable);
 
         Page<Item> itemsPage = service.getAllItemsByContainerId(id, pageable);
 
-        Link selfLink = linkTo(methodOn(ItemController.class).getAllItemsByContainerId(id, pageable)).withSelfRel();
-
-        return ResponseEntity.ok(HateoasUtil.toPagedModel(
-                itemsPage,
-                pageable,
-                HateoasUtil::toEntityModel,
-                selfLink
-        ));
+        return ResponseEntity.ok(
+                assembler.toModel(itemsPage, HateoasUtil::toEntityModel)
+        );
     }
 }

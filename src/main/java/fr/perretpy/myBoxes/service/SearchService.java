@@ -3,10 +3,8 @@ package fr.perretpy.myBoxes.service;
 import fr.perretpy.myBoxes.dto.SearchResponseDto;
 import fr.perretpy.myBoxes.model.Container;
 import fr.perretpy.myBoxes.model.Item;
-import fr.perretpy.myBoxes.model.Location;
 import fr.perretpy.myBoxes.repository.ContainerRepository;
 import fr.perretpy.myBoxes.repository.ItemRepository;
-import fr.perretpy.myBoxes.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,13 +17,11 @@ import java.util.List;
 
 @Service
 public class SearchService {
-    private final LocationRepository locationRepository;
     private final ContainerRepository containerRepository;
     private final ItemRepository itemRepository;
 
     @Autowired
-    public SearchService(LocationRepository locationRepository, ContainerRepository containerRepository, ItemRepository itemRepository) {
-        this.locationRepository = locationRepository;
+    public SearchService(ContainerRepository containerRepository, ItemRepository itemRepository) {
         this.containerRepository = containerRepository;
         this.itemRepository = itemRepository;
     }
@@ -39,25 +35,16 @@ public class SearchService {
         int baseQuota = pageSize / entityCount;
         int remainder = pageSize % entityCount;
 
-        int locationQuota = baseQuota + (remainder > 0 ? 1 : 0);
         int containerQuota = baseQuota + (remainder > 1 ? 1 : 0);
 
         long totalElement = 0;
 
-        Pageable locationPageable = PageRequest.of(page, locationQuota);
         Pageable containerPageable = PageRequest.of(page, containerQuota);
         Pageable itemPageable = PageRequest.of(page, baseQuota);
 
-        Page<Location> locationPage = locationRepository
-                .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, locationPageable);
-        List<SearchResponseDto> results = new ArrayList<>(locationPage.getContent().stream()
-                .map(SearchResponseDto::fromLocation)
-                .toList());
-        totalElement += locationPage.getTotalElements();
-
         Page<Container> containerPage = containerRepository
                 .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, containerPageable);
-        results.addAll(containerPage.getContent().stream()
+        List<SearchResponseDto> results = new ArrayList<>(containerPage.getContent().stream()
                 .map(SearchResponseDto::fromContainer)
                 .toList());
         totalElement += containerPage.getTotalElements();
@@ -71,5 +58,20 @@ public class SearchService {
 
         System.out.println(totalElement);
         return new PageImpl<>(results, pageable, totalElement);
+    }
+
+    public Page<SearchResponseDto> globalSearchV2(String query, Pageable pageable) {
+        Page<Container> containerPageName = containerRepository.fuzzySearchName(query, pageable);
+        Page<Container> containerPageDescription = containerRepository.fuzzySearchDescription(query, pageable);
+
+        /*
+        Page<Item> itemPageName = itemRepository.fuzzySearchName(query);
+        Page<Item> itemPageDescription = itemRepository.fuzzySearchDescription(query);
+         */
+
+        List<SearchResponseDto> results = new ArrayList<>();
+
+        //results.addAll(containerPageName)
+        return null;
     }
 }
